@@ -14,27 +14,27 @@ public class Game {
         return turn;
     }
 
-    public char[][] getTableArray() {
-        return tableArray;
+    public char[][] getTable() {
+        return table;
     }
 
-    private char[][] tableArray;
+    private char[][] table;
 
     public Game() {
         this(3);
     }
 
     public Game(int n) {
-        tableArray = new char[n][n];
+        table = new char[n][n];
 
-        for (var row : tableArray)
+        for (var row : table)
             Arrays.fill(row, ' ');
 
         turn = X;
     }
 
     public Game(char[][] Array) {
-        tableArray = Array;
+        table = Array;
     }
 
     public byte checkTable() {
@@ -42,55 +42,55 @@ public class Game {
         int counter_forX = 0;
         int counter_forO = 0;
 
-        for (int i = 0; i < tableArray.length; i++) {
+        for (int i = 0; i < table.length; i++) {
 
-            for (int j = 0; j < tableArray[0].length; j++) {
-                if (tableArray[i][j] == X) counter_forX++;
-                if (tableArray[i][j] == O) counter_forO++;
+            for (int j = 0; j < table[0].length; j++) {
+                if (table[i][j] == X) counter_forX++;
+                if (table[i][j] == O) counter_forO++;
             }
 
-            if (counter_forX == tableArray.length) return 1;
-            if (counter_forO == tableArray.length) return 2;
+            if (counter_forX == table.length) return 1;
+            if (counter_forO == table.length) return 2;
             counter_forX = 0;
             counter_forO = 0;
         }
 
-        for (int j = 0; j < tableArray.length; j++) {
+        for (int j = 0; j < table.length; j++) {
 
-            for (int i = 0; i < tableArray[0].length; i++) {
-                if (tableArray[i][j] == X) counter_forX++;
-                if (tableArray[i][j] == O) counter_forO++;
+            for (int i = 0; i < table[0].length; i++) {
+                if (table[i][j] == X) counter_forX++;
+                if (table[i][j] == O) counter_forO++;
             }
 
-            if (counter_forX == tableArray.length) return 1;
-            if (counter_forO == tableArray.length) return 2;
+            if (counter_forX == table.length) return 1;
+            if (counter_forO == table.length) return 2;
             counter_forX = 0;
             counter_forO = 0;
         }
 
-        for (int i = 0; i < tableArray.length; i++) {
-            if (tableArray[i][i] == X) counter_forX++;
-            if (tableArray[i][i] == O) counter_forO++;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i][i] == X) counter_forX++;
+            if (table[i][i] == O) counter_forO++;
         }
-        if (counter_forX == tableArray.length) return 1;
-        if (counter_forO == tableArray.length) return 2;
+        if (counter_forX == table.length) return 1;
+        if (counter_forO == table.length) return 2;
         counter_forX = 0;
         counter_forO = 0;
 
 
-        for (int i = 0; i < tableArray.length; i++) {
-            if (tableArray[i][tableArray.length - i - 1] == X) counter_forX++;
-            if (tableArray[i][tableArray.length - i - 1] == O) counter_forO++;
+        for (int i = 0; i < table.length; i++) {
+            if (table[i][table.length - i - 1] == X) counter_forX++;
+            if (table[i][table.length - i - 1] == O) counter_forO++;
         }
-        if (counter_forX == tableArray.length) return 1;
-        if (counter_forO == tableArray.length) return 2;
+        if (counter_forX == table.length) return 1;
+        if (counter_forO == table.length) return 2;
 
         return (byte) (isPlaying() ? 0 : 3);
     }
 
     public boolean isPlaying() {
-        for (char[] chars : tableArray) {
-            for (int j = 0; j < tableArray[0].length; j++) {
+        for (char[] chars : table) {
+            for (int j = 0; j < table[0].length; j++) {
                 if (chars[j] == Z) return true;
             }
         }
@@ -98,9 +98,9 @@ public class Game {
     }
 
     public boolean couldMakeMove(int x, int y) {
-        if (tableArray[x - 1][y - 1] != Z) return false;
+        if (table[x - 1][y - 1] != Z) return false;
 
-        tableArray[x - 1][y - 1] = turn;
+        table[x - 1][y - 1] = turn;
         changeTurn();
         return true;
     }
