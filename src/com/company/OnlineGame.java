@@ -10,25 +10,22 @@ import static java.lang.Integer.parseInt;
 
 public class OnlineGame implements IPrint {
 
-    private static final int PORT = 5000;
+    private static final int PORT = 4000;
+    private static ServerSocket serverSocket;
 
-    private final List<Socket> players = new ArrayList<>();
-    private final List<String> names = new ArrayList<>();
-    private final List<BufferedReader> readerPlayerList = new ArrayList<>();
-    private final List<PrintStream> printPlayerList = new ArrayList<>();
-
+    private final List<Player> players = new ArrayList<>();
     private Game ticTacToe;
 
 
     public OnlineGame() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(PORT);
+        serverSocket = new ServerSocket(PORT);
 
         while (true) {
 
             for (int i = players.size(); i < 2; i++)
-                addClient(serverSocket);
+                players.add(changeClient());
 
-            ticTacToe = new Game(); // initialize new game 3x3
+            ticTacToe = new Game(chooseSizeOfBoard()); // initialize new game 3x3
 
             byte checking;
 
@@ -37,8 +34,8 @@ public class OnlineGame implements IPrint {
 
                 checking = ticTacToe.checkTable();
 
-                for (var player : printPlayerList) {
-                    printShot_ForPlayer(player, ticTacToe.getTable()); // print table to each player
+                for (var player : players) {
+                    printShot_ForPlayer(player.getPlayerPrint(), ticTacToe.getTable()); // print table to each player
                 }
                 //printShotInConsole(ticTacToe.getTable()); // print table to server
 
@@ -50,16 +47,33 @@ public class OnlineGame implements IPrint {
 
     }
 
+    private int chooseSizeOfBoard(){
+        var ourPlayer = players.get(players.size() - 1);
+
+        ourPlayer.getPlayerPrint().println("Write count of blocks in one row / col.");
+        try {
+            return parseInt(ourPlayer.getReader().readLine());
+        } catch (IOException ignored) {}
+        return 3;
+    }
+
     private void readCoordinates__ToMakeMove(byte turn){
         boolean flag;
 
         do {
-            printPlayerList.get(turn).printf("Write coordinates for '%s', %s.", ticTacToe.getTurn(), names.get(turn));
-            printPlayerList.get(getAnotherTurn(turn)).printf("Waiting for %s bet by %s...", names.get(turn), ticTacToe.getTurn());
+            players.get(turn).getPlayerPrint().printf("Write coordinates for '%s', %s.", ticTacToe.getTurn(), players.get(turn).getName());
+            players.get(turn).getPlayerPrint().println();
+            players.get(getAnotherTurn()).getPlayerPrint().printf("Waiting for %s bet by %s...", players.get(turn).getName(), ticTacToe.getTurn());
+            players.get(getAnotherTurn()).getPlayerPrint().println();
 
             try {
+                var text = "";
+                try{
+                    text = players.get(turn).getReader().readLine();
+                } catch (Exception e){
+                    reloadPlayer(turn);
+                }
 
-                String text = readerPlayerList.get(turn).readLine();
                 var str = text.split(" ");
                 int x = parseInt(str[0]);
                 int y = parseInt(str[1]);
@@ -83,19 +97,19 @@ public class OnlineGame implements IPrint {
         return (byte) (ticTacToe.getTurn() == Game.X ? 0 : 1);
     }
 
-    private byte getAnotherTurn(byte turn){
-        return (byte) (turn == 1 ? 0 : 1);
+    private byte getAnotherTurn(){
+        return (byte) (ticTacToe.getTurn() == Game.X ? 1 : 0);
     }
 
     private void writeResults(byte checking){
         var text = checking == 1 ? "Winner is 'X'!" : checking == 2 ? "Winner is 'O'!" : checking == 3 ? "It is draw!" : "No Players!";
-        for (var player : printPlayerList) {
-            player.println(text);
+        for (var player : players) {
+            player.getPlayerPrint().println(text);
         }
         System.out.println(text);
     }
 
-    private void addClient(ServerSocket serverSocket) {
+    private Player changeClient() {
 
         System.out.println("Waiting for player connection...");
 
@@ -104,39 +118,22 @@ public class OnlineGame implements IPrint {
             var inputStream = client.getInputStream();
             var outputStream = client.getOutputStream();
 
-            readerPlayerList.add(new BufferedReader(new InputStreamReader(inputStream)));
-            printPlayerList.add(new PrintStream(outputStream));
-
-            players.add(client);
-            names.add(inputName());
+            return new Player(
+                    client,
+                    new BufferedReader(new InputStreamReader(inputStream)),
+                    new PrintStream(outputStream));
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
-    private String inputName(){
-        printPlayerList.get(printPlayerList.size() - 1).println("Print your name");
-        try {
-            return readerPlayerList.get(readerPlayerList.size() - 1).readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "BaseName";
+    private void reloadPlayer(byte turn){
+        players.remove(turn);
+        players.add(turn, changeClient());
+        printShot_ForPlayer(players.get(turn).getPlayerPrint(), ticTacToe.getTable());
     }
-
-   /* private boolean checkClients() {
-        boolean flag = false;
-
-        for (int i = 1; i >= 0; i--) {
-            if (!players.get(i).isConnected()) {
-                players.remove(i);
-                readerPlayerList.remove(i);
-                printPlayerList.remove(i);
-                flag = true;
-            }
-        }
-        return flag;
-    }*/
 
 }

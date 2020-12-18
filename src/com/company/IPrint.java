@@ -4,6 +4,37 @@ import java.io.PrintStream;
 
 public interface IPrint {
 
+    /*default String stringShotInConsole(char[][] table) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < table.length; i++) {
+            stringBuilder.append(stringSingleLine(table));
+            stringBuilder.append("\n");
+
+            for (int j = 0; j < table[0].length; j++) {
+                stringBuilder.append(" | ");
+                stringBuilder.append(table[i][j] == Game.Z ? " " : table[i][j] == Game.X ? "X" : "O");
+                if (j == table[0].length - 1) stringBuilder.append(" | ");
+            }
+            if (i == table.length - 1) stringBuilder.append(stringSingleLine(table));
+        }
+        stringBuilder.append("\n");
+
+        return String.valueOf(stringBuilder);
+    }
+
+    default String stringSingleLine(char[][] table) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append("\n");
+        for (int i = 0; i < table.length; i++) {
+            stringBuilder.append(i == 0 ? " |---" : i != table.length - 1 ? "+---" : "+---|");
+        }
+
+        return String.valueOf(stringBuilder);
+    }*/
+
+
     default void printShotInConsole(char[][] table) {
         for (int i = 0; i < table.length; i++) {
             printSingleLineInConsole(table);
