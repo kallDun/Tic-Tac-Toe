@@ -18,7 +18,9 @@ public class OnlineGame implements IPrint {
 
 
     public OnlineGame() throws IOException {
-        serverSocket = new ServerSocket(PORT);
+        String str = System.getenv("PORT");
+        int port = str != null ? Integer.parseInt(str) : PORT;
+        serverSocket = new ServerSocket(port);
 
         while (true) {
 
