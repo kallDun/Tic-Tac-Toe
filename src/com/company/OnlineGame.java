@@ -11,7 +11,7 @@ import static java.lang.Integer.parseInt;
 public class OnlineGame implements IPrint {
 
     private static final int PORT = 5000;
-    private static ServerSocket serverSocket;
+    private ServerSocket serverSocket;
 
     private final List<Player> players = new ArrayList<>();
     private Game ticTacToe;
